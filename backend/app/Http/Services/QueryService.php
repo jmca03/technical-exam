@@ -11,7 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class QueryService implements QueryRepository
 {
-    public function query(Request $request): JsonResponse|Response
+    /**
+     * Query url
+     * 
+     * @param \Illuminate\Http\Request $request
+     * 
+    //  * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Client\Response
+     */
+    public function query(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'url' => 'required|url'
@@ -19,21 +26,56 @@ class QueryService implements QueryRepository
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'url is not valid url or is not a rest api'
+                'message' => 'url is not valid url or is not an api.'
             ], 400);
         }
 
         $urlResponse = $this->urlResponse($request->url);
 
-        return $urlResponse;
+        $reverseResponse = $this->reverseResponse($urlResponse);
+
+        // return $urlResponse;
+        return $reverseResponse;
     }
 
-    private function urlResponse($url)
+    /**
+     * Returns URL Response
+     * 
+     * @param string url
+     * 
+     * @return \Illuminate\Http\Client\Response
+     */
+    private function urlResponse($url): Response
     {
         $response = Http::withHeaders([
             'Content-Type' => 'application/json'
         ])->get($url);
 
         return $response;
+    }
+
+    /**
+     * Reverse URL Response
+     * 
+     * @param \Illuminate\Http\Client\Response $response
+     * 
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    private function reverseResponse($response): JsonResponse
+    {
+
+        $jsonRespons = $response->collect()->reverse()->map(function ($values, $key) {
+
+            return collect($values)->flatten(function ($value, $key) {
+                $reverseValue = strrev($value);
+                $reverseKey = strrev($key);
+
+                return [
+                    $reverseKey => $reverseValue
+                ];
+            })->all();
+        })->values();
+
+        return response()->json($jsonRespons);
     }
 }

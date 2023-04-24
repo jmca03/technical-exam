@@ -21,9 +21,10 @@ class QueryController extends Controller
      * 
      * @param \Illuminate\Http\Request $request
      * 
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Client\Response
+    //  * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Client\Response
      */
-    public function query(Request $request): JsonResponse|Response
+    public function query(Request $request)
+    /** : JsonResponse|Response  */
     {
         return $this->queryService->query($request);
     }
