@@ -40,8 +40,10 @@ function query() {
     })
     .then(function (response) {
       const getUrlResponse = response.data.url_response;
+      const getReverse = response.data.reverse_response;
+
       urlResponse.value = JSON.stringify(getUrlResponse, null, 2);
-      reverseUrlResponse.value = JSON.stringify(reverseUrlResponse);
+      reverseUrlResponse.value = JSON.stringify(getReverse, null, 2);
     })
     .catch(function (error) {
       console.log(error);
